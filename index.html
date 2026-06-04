@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeCraft - Pobierz MCPE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Six+Caps&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Styl Główny - Ciemne tło z lodowymi akcentami */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0f14; /* Głęboka, czarna noc */
+            background-image: radial-gradient(circle at 50% 0%, rgba(0, 217, 255, 0.15) 0%, transparent 60%);
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0;
+            text-align: center;
+        }
+
+        header {
+            padding: 40px 20px 20px 20px;
+        }
+
+        h1 {
+            /* Zastosowanie czcionki Six Caps */
+            font-family: 'Six Caps', sans-serif;
+            font-size: 5rem; /* Six Caps musi być duża, bo jest wąska! */
+            color: #00ffff;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.6), 2px 2px 0px #000;
+            margin: 0;
+            letter-spacing: 4px; /* Rozstrzelenie liter dla lepszego efektu */
+            line-height: 1;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #8af0ff;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            margin-bottom: 25px;
+        }
+
+        /* Sekcja dużych przycisków na początku strony */
+        .featured-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        /* Styl dużego, długiego guzika */
+        .btn-large {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(16, 37, 48, 0.9) 0%, rgba(10, 20, 28, 0.9) 100%);
+            border: 2px solid #00ffff;
+            border-radius: 14px;
+            padding: 18px 25px;
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(0, 255, 255, 0.15), inset 0 0 15px rgba(0, 255, 255, 0.1);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-large .btn-text {
+            font-family: 'Six Caps', sans-serif;
+            font-size: 2.8rem;
+            letter-spacing: 3px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+            line-height: 1;
+        }
+
+        .btn-large .btn-desc {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            color: #8af0ff;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        /* Efekty hover dla dużych guzików */
+        .btn-large:hover, .btn-large:active {
+            transform: scale(0.98);
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(16, 37, 48, 0.9) 100%);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-large:hover .btn-text {
+            color: #fff;
+            text-shadow: 0 0 15px #fff;
+        }
+
+        /* Siatka kafelków */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            padding: 25px;
+            max-width: 800px;
+            margin: 20px auto 0 auto;
+        }
+
+        /* Styl kafelka - Ice & Dark */
+        .tile {
+            background: rgba(16, 28, 36, 0.75); /* Ciemna baza kafelka */
+            color: #00ffff;
+            border: 2px solid #3d7e9a; /* Lodowa ramka */
+            border-radius: 14px;
+            padding: 15px 10px;
+            text-decoration: none;
+            /* Zastosowanie czcionki Six Caps na kafelkach */
+            font-family: 'Six Caps', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 255, 255, 0.1);
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 0.9;
+        }
+
+        /* Efekt po naciśnięciu / najechaniu na kafelek */
+        .tile:active, .tile:hover {
+            transform: scale(0.95);
+            background: rgba(0, 255, 255, 0.15);
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), inset 0 0 5px rgba(255,255,255,0.4);
+            color: #fff;
+        }
+
+        .version-tag {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            color: #8af0ff;
+            margin-top: 8px;
+            opacity: 0.9;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 8px;
+            border-radius: 10px;
+            letter-spacing: 0px; /* Reset letter-spacing dla małego tekstu */
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: #4a5568;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SAFECRAFT</h1>
+    <div class="subtitle">Bezpieczne wersje bez reklam i wirusów</div>
+</header>
+
+<section class="featured-buttons">
+    <a href="https://mcpedl.org/uploads_files/26-05-2026/minecraft-26-23.apk" class="btn-large download-link">
+        <span class="btn-text">NAJNOWSZA WERSJA</span>
+        <span class="btn-desc">POBIERZ APK</span>
+    </a>
+    <a href="https://mcpedl.org/uploads_files/02-06-2026/minecraft-26-40-20.apk" class="btn-large download-link">
+        <span class="btn-text">NAJNOWSZE BETA</span>
+        <span class="btn-desc">TESTUJ NOWOŚCI</span>
+    </a>
+</section>
+
+<main class="grid">
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/26-05-2026/minecraft-26-23.apk">
+        MCPE
+        <span class="version-tag">v1.26.23</span>
+    </a>
+
+    <a class="tile download-link" href="minecraft-pe-0-13-1.apk">MCPE <span class="version-tag">0.13.1</span></a>
+    <a class="tile download-link" href="minecraft-0-8-0.apk">MCPE <span class="version-tag">0.8.0</span></a>
+    <a class="tile download-link" href="minecraft-pocket-edition-demo.apk">MCPE <span class="version-tag">staroć</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/22-07-2025/minecraft-1-16-1-02-xbox-servers.apk">MCPE <span class="version-tag">1.16.1</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/31-12-2020/minecraft-pe-1-0-9.apk">MCPE <span class="version-tag">1.0.9</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/27-10-2024/minecraft-1-9-0.apk">MCPE <span class="version-tag">1.9.0</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/29-04-2024/minecraft-1-20-81.apk">MCPE <span class="version-tag">1.20.81 brak bgm</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/28-06-2024/minecraft-1-21-0.apk">MCPE <span class="version-tag">1.21</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/07-06-2022/minecraft-1-17-10.apk">MCPE <span class="version-tag">1.17.1</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/18-07-2023/minecraft-1-18-1.apk">MCPE <span class="version-tag">1.18.1</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/15-02-2022/minecraft-pe-0-3-0.apk">MCPE <span class="version-tag">staroć część 2</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/03-01-2021/minecraft-pe-0-14-3.apk">MCPE <span class="version-tag">0.14.3</span></a>
+    <a class="tile download-link" href="https://mcpedl.org/uploads_files/22-11-2022/minecraft-1-19-20.apk">MCPE <span class="version-tag">1.19.20</span></a>
+    <a class="tile download-link" href="https://www.lidl.pl/p/silvercrest-termorobot-mc-smart-z-wi-fi-1200-w-antracytowy-matowy/p100401349#searchTrackingMasterId=Product.100401349&searchTrackingTitle=Termorobot+MC+Smart+z+Wi-Fi,+1200+W,+antracytowy+matowy&searchTrackingPageSize=48&searchTrackingPage=1&searchTrackingEvent=click&searchTrackingId=Product.100401349&searchTrackingOrigPos=1&searchTrackingPos=2&searchTrackingOrigPageSize=48&searchTrackingChannel=PL&list=/h/termorobot-mc-smart/h10067521">OMG <span class="version-tag">NAJLEPSZA WERSJA</span></a>
+</main>
+
+<footer>
+    &copy; 2026 SafeCraft Hub - Pobierasz na własną odpowiedzialność. Pliki są czyste.
+</footer>
+
+<script>
+    const searches = [
+        "minecraft 1.26.23",
+        "mcpe free download",
+        "minecraft bez reklam",
+        "bezpieczne apk mcpe",
+        "minecraft pocket edition 2026",
+        "mcpe najnowsza wersja",
+        "minecraft android czysty",
+        "safe mcpe apk"
+    ];
+    
+    console.log("Wyszukiwarka zainicjalizowana. Załadowano frazy:", searches);
+
+    // MECHANIZM LOSOWEGO TROLLA (25% szans na Bebzuna)
+    document.querySelectorAll('.download-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Losujemy liczbę od 1 do 100
+            const chance = Math.floor(Math.random() * 100) + 1;
+            
+            // Jeśli wylosowano 25 lub mniej (czyli 25% szans)
+            if (chance <= 25) {
+                e.preventDefault(); // Blokujemy normalne pobieranie pliku
+                window.open('https://KrisPolaris.github.io/OrkaNet/bebzun.html', '_blank'); // Otwieramy Bebzuna w nowej karcie
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
