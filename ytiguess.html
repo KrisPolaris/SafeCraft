@@ -27,6 +27,7 @@
             color: #ffffff;
             display: inline-block;
             margin-right: 10px;
+            cursor: pointer;
         }
 
         #search-box {
@@ -57,6 +58,23 @@
             cursor: pointer;
         }
 
+        #filter-box {
+            background-color: #1c1c1c;
+            padding: 5px 10px 10px 10px;
+            text-align: center;
+            border-bottom: 1px solid #2d2d2d;
+        }
+
+        .filter-btn {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 5px 15px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
         #player-container {
             display: none;
             background-color: #000;
@@ -68,12 +86,22 @@
             width: 100%;
             height: 200px;
             border: none;
+            transition: height 0.3s ease;
+        }
+
+        /* Klasa zmieniająca odtwarzacz w pionowy dla Shortsów */
+        #video-player.shorts-player {
+            width: 70%;
+            height: 450px;
+            max-width: 320px;
+            margin: 0 auto;
         }
 
         #video-list {
             padding: 10px;
         }
         
+        /* Klasyczny wygląd filmów */
         .video-item {
             display: block;
             background-color: #1e1e1e;
@@ -101,6 +129,48 @@
             background-color: #000;
             display: block;
             border-radius: 4px;
+            object-fit: cover;
+        }
+
+        /* NOWOŚĆ: Pionowy układ kafelków (Grid) specjalnie dla Shortsów */
+        .shorts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .shorts-grid .video-item {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 0;
+            padding: 6px;
+        }
+
+        .shorts-grid .thumbnail-container {
+            width: 100%;
+            float: none;
+            margin-right: 0;
+            margin-bottom: 6px;
+        }
+
+        .shorts-grid .thumbnail {
+            width: 100%;
+            height: 210px; /* Wysoka, pionowa miniatura */
+        }
+
+        /* Styl dla zastępczego awatara kanału */
+        .channel-avatar-fallback {
+            width: 80px;
+            height: 80px;
+            background-color: #444;
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 80px;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 5px auto;
         }
         
         .video-info {
@@ -137,14 +207,18 @@
 <body>
 
 <div id="header">
-    <span id="logo">Jutjub</span>
+    <span id="logo" onclick="loadTrending();">Jutjub</span>
 </div>
 
 <div id="search-box">
     <div style="display: block;">
-        <input type="text" id="search-input" placeholder="Search..." value="Minecraft Pocket Edition">
+        <input type="text" id="search-input" placeholder="Wpisz @nazwa lub #shorts..." value="Minecraft">
         <button type="button" id="search-button" onclick="searchVideos();">Search</button>
     </div>
+</div>
+
+<div id="filter-box">
+    <button class="filter-btn" onclick="loadTrending()">🔥 Odkrywaj popularne</button>
 </div>
 
 <div id="player-container">
@@ -153,11 +227,10 @@
 </div>
 
 <div id="video-list">
-    <div id="status-message">Wpisz coś i kliknij Szukaj...</div>
+    <div id="status-message">Ładowanie strony głównej...</div>
 </div>
 
 <script type="text/javascript">
-    // Lista stabilnych instancji Invidious pod starsze urządzenia
     var apiInstances = [
         "https://yewtu.be",
         "https://inv.tux.digital",
@@ -165,15 +238,41 @@
         "https://iv.melmac.space"
     ];
     var currentInstanceIndex = 0;
+    var isTrendingMode = false;
+    var isShortsMode = false; // Nowa zmienna wykrywająca tryb Shorts
+    var currentType = "video";
 
-    // Automatyczne wyszukiwanie po załadowaniu strony
     window.onload = function() {
-        searchVideos();
+        loadTrending();
     };
 
+    function loadTrending() {
+        isTrendingMode = true;
+        isShortsMode = false;
+        currentType = "video"; 
+        
+        // Reset wyglądu listy i playera do zwykłego trybu
+        document.getElementById("video-list").className = "";
+        document.getElementById("video-player").className = "";
+        
+        var listContainer = document.getElementById("video-list");
+        listContainer.innerHTML = '<div id="status-message">Ładowanie sekcji Odkrywaj...</div>';
+        
+        var instance = apiInstances[currentInstanceIndex];
+        var apiUrl = instance + "/api/v1/trending?region=PL";
+        
+        makeRequest(apiUrl);
+    }
+
     function searchVideos() {
+        isTrendingMode = false;
+        isShortsMode = false;
+        
+        // Reset klas na start wyszukiwania
+        document.getElementById("video-list").className = "";
+        document.getElementById("video-player").className = "";
+        
         var query = document.getElementById("search-input").value;
-        var status = document.getElementById("status-message");
         var listContainer = document.getElementById("video-list");
         
         if (!query) {
@@ -181,14 +280,40 @@
             return;
         }
         
-        // Zmieniamy tekst statusu, żeby było widać, że guzik zadziałał
-        listContainer.innerHTML = '<div id="status-message">Loading videos...</div>';
+        listContainer.innerHTML = '<div id="status-message">Loading...</div>';
+        
+        // 1. Wykrywanie sekretnych haseł lub znaku #
+        var cleanQuery = query.trim().toUpperCase();
+        if (query.charAt(0) === '#') {
+            isShortsMode = true;
+            currentType = "video";
+            // Zmieniamy np. #minecraft na "minecraft shorts", żeby API znalazło odpowiednie filmy
+            query = query.substring(1) + " shorts";
+        } else if (cleanQuery === "CHECK THE SOUND" || cleanQuery === "DONT CHECK THE SOUND") {
+            isShortsMode = true;
+            currentType = "video";
+            query = query + " shorts";
+        } else if (query.charAt(0) === '@') {
+            currentType = "channel";
+            query = query.substring(1);
+        } else {
+            currentType = "video";
+        }
+        
+        // Włączamy pionowy siatkowy układ (grid) jeśli to Shortsy
+        if (isShortsMode) {
+            listContainer.className = "shorts-grid";
+        }
         
         var instance = apiInstances[currentInstanceIndex];
-        var apiUrl = instance + "/api/v1/search?q=" + encodeURIComponent(query) + "&type=video";
+        var apiUrl = instance + "/api/v1/search?q=" + encodeURIComponent(query) + "&type=" + currentType;
         
+        makeRequest(apiUrl);
+    }
+
+    function makeRequest(url) {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", apiUrl, true);
+        xhr.open("GET", url, true);
         
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
@@ -208,45 +333,63 @@
     }
 
     function handleFallback() {
-        // Przełączamy na kolejny serwer z listy, jeśli obecny nie odpowiada
         currentInstanceIndex++;
         if (currentInstanceIndex < apiInstances.length) {
-            searchVideos();
+            if (isTrendingMode) {
+                loadTrending();
+            } else {
+                searchVideos();
+            }
         } else {
-            currentInstanceIndex = 0; // Reset indexu
-            document.getElementById("video-list").innerHTML = '<div id="status-message" style="color:#ff3333;">Błąd połączenia. Kliknij Szukaj ponownie!</div>';
+            currentInstanceIndex = 0;
+            document.getElementById("video-list").innerHTML = '<div id="status-message" style="color:#ff3333;">Błąd połączenia. Spróbuj ponownie!</div>';
         }
     }
 
-    function renderResults(videos) {
+    function renderResults(data) {
         var listContainer = document.getElementById("video-list");
         
-        if (!videos || videos.length === 0) {
-            listContainer.innerHTML = '<div id="status-message">Nie znaleziono filmów.</div>';
+        if (!data || data.length === 0) {
+            listContainer.innerHTML = '<div id="status-message">Brak wyników.</div>';
             return;
         }
         
         var html = "";
         
-        for (var i = 0; i < videos.length; i++) {
-            var video = videos[i];
-            var thumbUrl = "";
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i];
             
-            if (video.videoThumbnails && video.videoThumbnails.length > 0) {
-                thumbUrl = video.videoThumbnails[0].url;
+            if (currentType === "channel" && item.type === "channel") {
+                var firstLetter = item.author ? item.author.charAt(0).toUpperCase() : "?";
+                
+                html += '<div class="video-item" onclick="document.getElementById(\'search-input\').value=\'' + escapeHtml(item.author) + '\'; searchVideos();">';
+                html += '  <div class="thumbnail-container">';
+                html += '    <div class="channel-avatar-fallback">' + firstLetter + '</div>';
+                html += '  </div>';
+                html += '  <div class="video-info" style="padding-top: 20px;">';
+                html += '    <div class="video-title" style="font-size: 15px;">' + item.author + '</div>';
+                html += '    <div class="video-author">' + (item.subCount ? item.subCount + ' subskrybentów' : 'Kanał') + '</div>';
+                html += '  </div>';
+                html += '  <div class="clear"></div>';
+                html += '</div>';
+            } 
+            else if (item.videoId) {
+                var thumbUrl = "";
+                if (item.videoThumbnails && item.videoThumbnails.length > 0) {
+                    thumbUrl = item.videoThumbnails[0].url;
+                }
+                
+                html += '<div class="video-item" onclick="playVideo(\'' + item.videoId + '\', \'' + escapeHtml(item.title) + '\')">';
+                html += '  <div class="thumbnail-container">';
+                html += '    <img class="thumbnail" src="' + thumbUrl + '">';
+                html += '  </div>';
+                html += '  <div class="video-info">';
+                html += '    <div class="video-title">' + item.title + '</div>';
+                html += '    <div class="video-author">' + item.author + '</div>';
+                html += '  </div>';
+                html += '  <div class="clear"></div>';
+                html += '</div>';
             }
-            
-            // Bezpieczne generowanie HTML dla starego Androida
-            html += '<div class="video-item" onclick="playVideo(\'' + video.videoId + '\', \'' + escapeHtml(video.title) + '\')">';
-            html += '  <div class="thumbnail-container">';
-            html += '    <img class="thumbnail" src="' + thumbUrl + '">';
-            html += '  </div>';
-            html += '  <div class="video-info">';
-            html += '    <div class="video-title">' + video.title + '</div>';
-            html += '    <div class="video-author">' + video.author + '</div>';
-            html += '  </div>';
-            html += '  <div class="clear"></div>';
-            html += '</div>';
         }
         
         listContainer.innerHTML = html;
@@ -256,6 +399,13 @@
         var playerContainer = document.getElementById("player-container");
         var iframe = document.getElementById("video-player");
         var titleContainer = document.getElementById("playing-title");
+        
+        // Jeśli jesteśmy w trybie Shorts, nadajemy odtwarzaczowi pionowy styl
+        if (isShortsMode) {
+            iframe.className = "shorts-player";
+        } else {
+            iframe.className = "";
+        }
         
         iframe.src = "https://www.youtube.com/embed/" + id + "?autoplay=1&controls=1";
         titleContainer.innerHTML = title;
