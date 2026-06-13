@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>jutjub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+        
+        #header {
+            background-color: #e50914;
+            padding: 10px;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        #logo {
+            font-weight: bold;
+            font-size: 18px;
+            color: #ffffff;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        #search-box {
+            padding: 10px;
+            background-color: #1c1c1c;
+            text-align: center;
+        }
+        
+        #search-input {
+            width: 60%;
+            padding: 6px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: #fff;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        
+        #search-button {
+            width: 28%;
+            padding: 6px;
+            background-color: #e50914;
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #player-container {
+            display: none;
+            background-color: #000;
+            padding: 5px;
+            text-align: center;
+        }
+        
+        #video-player {
+            width: 100%;
+            height: 200px;
+            border: none;
+        }
+
+        #video-list {
+            padding: 10px;
+        }
+        
+        .video-item {
+            display: block;
+            background-color: #1e1e1e;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #ffffff;
+            border: 1px solid #2d2d2d;
+        }
+        
+        .video-item:active {
+            background-color: #333333;
+        }
+        
+        .thumbnail-container {
+            width: 120px;
+            float: left;
+            margin-right: 10px;
+        }
+        
+        .thumbnail {
+            width: 120px;
+            height: 90px;
+            background-color: #000;
+            display: block;
+            border-radius: 4px;
+        }
+        
+        .video-info {
+            overflow: hidden;
+        }
+        
+        .video-title {
+            font-weight: bold;
+            font-size: 13px;
+            line-height: 1.3;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .video-author {
+            color: #aaa;
+            font-size: 11px;
+        }
+        
+        .clear {
+            clear: both;
+        }
+        
+        #status-message {
+            text-align: center;
+            padding: 20px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+<div id="header">
+    <span id="logo">Jutjub</span>
+</div>
+
+<div id="search-box">
+    <div style="display: block;">
+        <input type="text" id="search-input" placeholder="Search..." value="Minecraft Pocket Edition">
+        <button type="button" id="search-button" onclick="searchVideos();">Search</button>
+    </div>
+</div>
+
+<div id="player-container">
+    <iframe id="video-player" src="" allowfullscreen></iframe>
+    <div id="playing-title" style="padding: 8px; font-weight: bold; font-size: 12px; text-align: left;"></div>
+</div>
+
+<div id="video-list">
+    <div id="status-message">Wpisz coś i kliknij Szukaj...</div>
+</div>
+
+<script type="text/javascript">
+    // Lista stabilnych instancji Invidious pod starsze urządzenia
+    var apiInstances = [
+        "https://yewtu.be",
+        "https://inv.tux.digital",
+        "https://invidious.flokinet.to",
+        "https://iv.melmac.space"
+    ];
+    var currentInstanceIndex = 0;
+
+    // Automatyczne wyszukiwanie po załadowaniu strony
+    window.onload = function() {
+        searchVideos();
+    };
+
+    function searchVideos() {
+        var query = document.getElementById("search-input").value;
+        var status = document.getElementById("status-message");
+        var listContainer = document.getElementById("video-list");
+        
+        if (!query) {
+            alert("Wpisz coś do wyszukiwarki!");
+            return;
+        }
+        
+        // Zmieniamy tekst statusu, żeby było widać, że guzik zadziałał
+        listContainer.innerHTML = '<div id="status-message">Loading videos...</div>';
+        
+        var instance = apiInstances[currentInstanceIndex];
+        var apiUrl = instance + "/api/v1/search?q=" + encodeURIComponent(query) + "&type=video";
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", apiUrl, true);
+        
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        renderResults(data);
+                    } catch(e) {
+                        handleFallback();
+                    }
+                } else {
+                    handleFallback();
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    function handleFallback() {
+        // Przełączamy na kolejny serwer z listy, jeśli obecny nie odpowiada
+        currentInstanceIndex++;
+        if (currentInstanceIndex < apiInstances.length) {
+            searchVideos();
+        } else {
+            currentInstanceIndex = 0; // Reset indexu
+            document.getElementById("video-list").innerHTML = '<div id="status-message" style="color:#ff3333;">Błąd połączenia. Kliknij Szukaj ponownie!</div>';
+        }
+    }
+
+    function renderResults(videos) {
+        var listContainer = document.getElementById("video-list");
+        
+        if (!videos || videos.length === 0) {
+            listContainer.innerHTML = '<div id="status-message">Nie znaleziono filmów.</div>';
+            return;
+        }
+        
+        var html = "";
+        
+        for (var i = 0; i < videos.length; i++) {
+            var video = videos[i];
+            var thumbUrl = "";
+            
+            if (video.videoThumbnails && video.videoThumbnails.length > 0) {
+                thumbUrl = video.videoThumbnails[0].url;
+            }
+            
+            // Bezpieczne generowanie HTML dla starego Androida
+            html += '<div class="video-item" onclick="playVideo(\'' + video.videoId + '\', \'' + escapeHtml(video.title) + '\')">';
+            html += '  <div class="thumbnail-container">';
+            html += '    <img class="thumbnail" src="' + thumbUrl + '">';
+            html += '  </div>';
+            html += '  <div class="video-info">';
+            html += '    <div class="video-title">' + video.title + '</div>';
+            html += '    <div class="video-author">' + video.author + '</div>';
+            html += '  </div>';
+            html += '  <div class="clear"></div>';
+            html += '</div>';
+        }
+        
+        listContainer.innerHTML = html;
+    }
+
+    function playVideo(id, title) {
+        var playerContainer = document.getElementById("player-container");
+        var iframe = document.getElementById("video-player");
+        var titleContainer = document.getElementById("playing-title");
+        
+        iframe.src = "https://www.youtube.com/embed/" + id + "?autoplay=1&controls=1";
+        titleContainer.innerHTML = title;
+        
+        playerContainer.style.display = "block";
+        window.scrollTo(0, 0);
+    }
+
+    function escapeHtml(text) {
+        if (!text) return "";
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "\\'");
+    }
+</script>
+
+</body>
+</html>
