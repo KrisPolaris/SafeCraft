@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eŻul - Oficjalny Sklep</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
+            background-attachment: fixed;
+            color: #1e293b;
+            font-family: 'Roboto', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #ffffff;
+            border-bottom: 4px solid #38bdf8;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Bungee', cursive;
+            font-size: 3.5rem;
+            color: #0284c7;
+            text-shadow: 3px 3px 0px #bae6fd;
+            letter-spacing: 2px;
+        }
+
+        /* --- STYLOWANIE PANELU LOGOWANIA --- */
+        .login-box {
+            background: #ffffff;
+            border: 3px solid #0284c7;
+            border-radius: 12px;
+            max-width: 400px;
+            margin: 20px auto 0 auto;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .login-box h3 {
+            font-family: 'Bungee', cursive;
+            color: #0f172a;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #38bdf8;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 10px;
+            background-color: #0284c7;
+            color: #ffffff;
+            border: none;
+            font-family: 'Bungee', cursive;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 0px #0369a1;
+            transition: background-color 0.2s;
+        }
+
+        .btn-login:hover {
+            background-color: #0369a1;
+        }
+
+        .btn-login:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .user-logged-info {
+            font-family: 'Bungee', cursive;
+            color: #16a34a;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .btn-logout {
+            padding: 5px 15px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            font-family: 'Roboto', sans-serif;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+        }
+        /* ----------------------------------- */
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 3px solid #cbd5e1;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #38bdf8;
+            box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.2);
+        }
+
+        .img-container {
+            background-color: #f8fafc;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 10px;
+        }
+
+        .card-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .card-title {
+            font-family: 'Bungee', cursive;
+            font-size: 1.4rem;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .card-price {
+            font-family: 'Bungee', cursive;
+            font-size: 1.5rem;
+            color: #0284c7;
+            margin-bottom: 15px;
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 12px;
+            background-color: #38bdf8;
+            color: #ffffff;
+            border: none;
+            font-family: 'Bungee', cursive;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 0px #0284c7;
+        }
+
+        .btn-add:hover {
+            background-color: #0ea5e9;
+        }
+
+        .btn-add:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        footer {
+            background-color: #0f172a;
+            color: #94a3b8;
+            text-align: center;
+            padding: 25px;
+            font-family: 'Bungee', cursive;
+            font-size: 1.1rem;
+            margin-top: auto;
+            border-top: 4px solid #38bdf8;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>eŻul</h1>
+</header>
+
+<!-- PANEL FAKE LOGOWANIA -->
+<div class="login-box" id="loginBox">
+    <div id="loginForm">
+        <h3>Zaloguj się do eŻul</h3>
+        <div class="input-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="np. Żuliet">
+        </div>
+        <div class="input-group">
+            <label for="password">Hasło:</label>
+            <input type="password" id="password" placeholder="np. 123456">
+        </div>
+        <button class="btn-login" onclick="fakeLogin()">Zaloguj się</button>
+    </div>
+    
+    <div id="loggedInStatus" style="display: none;">
+        <div class="user-logged-info">Zalogowano jako: <span id="displayUser"></span> 🍻</div>
+        <button class="btn-logout" onclick="fakeLogout()">Wyloguj (Zwiń konto)</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="grid">
+
+        <div class="card">
+            <div class="img-container">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFqvt8qStIwqdsEOJl0UOePA6-8uGirBrF4P9waXuRvA&s=10" alt="Piwo" class="product-img">
+            </div>
+            <div class="card-content">
+                <div class="card-title">Piwo</div>
+                <div class="card-desc">Klasyczne, zimne i niezawodne w każdej sytuacji życiowej.</div>
+                <div class="card-price">2,99zł</div>
+                <button class="btn-add" onclick="alert('Dodano Piwo do koszyka!')">Do koszyka</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="img-container">
+                <img src="https://i0.wp.com/www.wodkanawesela.pl/wp-content/uploads/2020/10/stumbras-z-klosem-05l-1.jpg?fit=1080,1080&ssl=1" alt="Wóda" class="product-img">
+            </div>
+            <div class="card-content">
+                <div class="card-title">Wóda</div>
+                <div class="card-desc">Przejrzysta jak poranek po udanej nocy na ławeczce.</div>
+                <div class="card-price">29,99zł</div>
+                <button class="btn-add" onclick="alert('Dodano Wódę do koszyka!')">Do koszyka</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="img-container">
+                <img src="1782831932847.png" alt="Atomizer Pierd" class="product-img">
+            </div>
+            <div class="card-content">
+                <div class="card-title">Atomizer Pierd</div>
+                <div class="card-desc">Ekskluzywny zapach, który natychmiastowo czyści całe pomieszczenie.</div>
+                <div class="card-price">176,99zł</div>
+                <button class="btn-add" onclick="alert('Dodano Atomizer Pierd do koszyka!')">Do koszyka</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="img-container">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTllTnS-b5kMzaa5DrUgNoB37bJ7TqRPhdFKLdHVhLfkDU6mwC9dIBDwXNh&s=10" alt="Smecta" class="product-img">
+            </div>
+            <div class="card-content">
+                <div class="card-title">Smecta</div>
+                <div class="card-desc">Apteczny ratunek, kiedy orkiestrowy koncert w brzuchu gra zbyt głośno.</div>
+                <div class="card-price">59,99zł</div>
+                <button class="btn-add" onclick="alert('Dodano Smectę do koszyka!')">Do koszyka</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="img-container">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSH-gdOOyzv9XSkRlcwT6busn5O9IsIwbwDRRTSNKQoapRTbcBSmgimoONa&s=10" alt="Ławeczka" class="product-img">
+            </div>
+            <div class="card-content">
+                <div class="card-title">Ławeczka</div>
+                <div class="card-desc">Centrum dowodzenia żuli. Ergonomiczna, wygodna i zawsze wolna.</div>
+                <div class="card-price">999zł</div>
+                <button class="btn-add" onclick="alert('Dodano Ławeczkę do koszyka!')">Do koszyka</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="img-container">
+                <img src="ezul6.png" alt="Anty Kanapoćna dijareja" class="product-img">
+            </div>
+            <div class="card-content">
+                <div class="card-title">Anty Kanapoćna dijareja</div>
+                <div class="card-desc">Specjalistyczna zapora ochronna. Żaden kebab ani przeterminowany eŻul Cię nie złamie.</div>
+                <div class="card-price">49zł</div>
+                <button class="btn-add" onclick="alert('Dodano Anty Kanapoćna dijareja do koszyka!')">Do koszyka</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="img-container">
+                <img src="Bebuch.png" alt="Bebzun" class="product-img">
+            </div>
+            <div class="card-content">
+                <div class="card-title">Bebzun</div>
+                <div class="card-desc">Przyjaciel każdego żula! Wymaga odpowiedniego karmienia i opieki.</div>
+                <div class="card-price">29,99zł</div>
+                <button class="btn-add" onclick="alert('Dodano Bebzuna do koszyka!')">Do koszyka</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="img-container">
+                <img src="1782832127449.png" alt="Bebzun Touch" class="product-img">
+            </div>
+            <div class="card-content">
+                <div class="card-title">Bebzun Touch</div>
+                <div class="card-desc">Wszystko co dotkniesz zamirnia sie w bebzun</div>
+                <div class="card-price">399zł</div>
+                <button class="btn-add" onclick="alert('Dodano Bebzun Touch do koszyka!')">Do koszyka</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    eŻul 2026. Ciekawe czy jakiś żuliet coś kupi
+</footer>
+
+<script>
+    function fakeLogin() {
+        var user = document.getElementById('username').value.trim();
+        var pass = document.getElementById('password').value.trim();
+
+        if(user === "" || pass === "") {
+            alert("Weź wpisz cokolwiek, żulu!");
+            return;
+        }
+
+        // Akceptuje każde dane, tworząc "fake" sesję tylko w pamięci skryptu
+        document.getElementById('displayUser').innerText = user;
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('loggedInStatus').style.display = 'block';
+        
+        alert("Pomyślnie zalogowano konto: " + user + ".");
+    }
+
+    function fakeLogout() {
+        // Czyszczenie i powrót do formularza
+        document.getElementById('username').value = "";
+        document.getElementById('password').value = "";
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('loggedInStatus').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
